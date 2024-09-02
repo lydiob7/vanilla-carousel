@@ -96,10 +96,10 @@
             gap: 24px;
             flex-wrap: nowrap !important;
             overflow: auto;
-            padding-left: max(2rem, calc(50vw - (1350px / 2)));
+            padding-left: 1rem;
             scroll-behavior: smooth;
             scroll-snap-type: x mandatory;
-            scroll-padding-left: max(2rem, calc(50vw - (1350px / 2)));
+            scroll-padding-left: 1rem;
         }
 
         .carousel .col {
@@ -109,17 +109,39 @@
 
         .carousel .col .column_container {
             flex-shrink: 0;
-            width: 488px !important;
+            width: calc(100vw - 2rem) !important;
+            min-height: 250px;
             scroll-snap-align: start;
 
             /* REMOVE THIS */
             min-height: 250px;
             background: rgb(55, 55, 55);
         }
+
+        @media (min-width: 1000px) {
+            .carousel .col {
+                padding-left: max(2rem, calc(50vw - (1350px / 2)));
+                scroll-padding-left: max(2rem, calc(50vw - (1350px / 2)));
+            }
+
+            .carousel .col .column_container {
+                width: 488px !important;
+            }
+        }
     </style>
 
     <div class="carousel">
         <div class="col">
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
+            <div class="column_container child_column"></div>
             <div class="column_container child_column"></div>
             <div class="column_container child_column"></div>
             <div class="column_container child_column"></div>

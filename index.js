@@ -12,10 +12,13 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
 
     function isInViewport(element) {
         const rect = element.getBoundingClientRect();
+        //  Return true if left side of element is after the left
+        //  of the screen and its right side is before the end of the screen
         return rect.left >= 0 && rect.right <= (window.innerWidth || document.documentElement.clientWidth);
     }
 
-    function scrollCarousel(direction) {
+    function scrollCarouselByDirection(direction) {
+        // Early return if trying to go left of the first element or right on the last element
         if (
             (direction === "previous" && (currentVisibleVideoIndex === 0 || isInViewport(carouselItems[0]))) ||
             (direction === "next" &&
@@ -24,10 +27,26 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
         )
             return;
 
+        // Update current visible index and scroll carousel
         const newVisibleVideoIndex =
             direction === "previous" ? currentVisibleVideoIndex - 1 : currentVisibleVideoIndex + 1;
         currentVisibleVideoIndex = newVisibleVideoIndex;
         carousel.scrollLeft = carouselItems[newVisibleVideoIndex]?.offsetLeft;
+    }
+
+    function scrollCarouselByIndex(index) {
+        // Early return if trying to go left of the first element or right on the last element
+        if (
+            (index === 0 && (currentVisibleVideoIndex === 0 || isInViewport(carouselItems[0]))) ||
+            (index === carouselItems.length - 1 &&
+                (currentVisibleVideoIndex === carouselItems.length - 1 ||
+                    isInViewport(carouselItems[carouselItems.length - 1])))
+        )
+            return;
+
+        // Update current visible index and scroll carousel
+        currentVisibleVideoIndex = index;
+        carousel.scrollLeft = carouselItems[index]?.offsetLeft;
     }
 
     function resetScrollBar() {
@@ -35,6 +54,7 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
 
         const containerWidth = carouselWrapper.offsetWidth;
         const childWidth = carousel.scrollWidth;
+        // Calculate scrollbar thumb width as percentage of the view width
         const thumbPercent = (containerWidth * 100) / childWidth;
 
         scrollBarThumb.style.pointerEvents = "none";
@@ -42,35 +62,17 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
         scrollBarThumb.style.width = `${thumbPercent}%`;
     }
 
-    function resetCarousel() {
-        currentVisibleVideoIndex = 0;
-        carousel.scrollLeft = carouselItems[0]?.offsetLeft;
-
-        resetScrollBar();
-
-        if (!previousButton || !nextButton) return;
-        previousButton.disabled = true;
-        if (isInViewport(carouselItems[carouselItems.length - 1])) nextButton.disabled = true;
-        else nextButton.disabled = false;
-    }
-
     function updateControlsAndScrollbarOnScroll() {
         if (nextButton && previousButton) {
+            // Update buttons state depending on carousel position
             if (isInViewport(carouselItems[carouselItems.length - 1])) nextButton.disabled = true;
             else nextButton.disabled = false;
             if (isInViewport(carouselItems[0])) previousButton.disabled = true;
             else previousButton.disabled = false;
         }
 
-        carouselItems.forEach((item, index) => {
-            if (
-                item.offsetLeft - carousel.scrollLeft > 0 &&
-                item.offsetLeft - carousel.scrollLeft < item.clientWidth / 4
-            )
-                currentVisibleVideoIndex = index;
-        });
-
         if (scrollBarThumb) {
+            // Update scroll bar thumb position in relation with current carousel scroll state
             const childWidth = carousel.scrollWidth;
             const thumbOffsetPercent = (carousel.scrollLeft * 100) / childWidth;
 
@@ -78,23 +80,46 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
         }
     }
 
+    function updateIndexOnScrollEnd() {
+        // Recalculate current visible index after scroll. This is to avoid the last element
+        // to be marked as current if previous element is also completely in view.
+        let updated = false;
+        carouselItems.forEach((item, index) => {
+            if (updated) return;
+            const itemX = item.offsetLeft - carousel.scrollLeft;
+            if (itemX > 0) {
+                updated = true;
+                currentVisibleVideoIndex = index;
+            }
+        });
+    }
+
     function makeScrollBarInteractive(ev) {
         if (!scrollBarThumb) return;
 
+        // Calculate the percentage from the left of the click event
         const { offsetWidth, offsetLeft } = ev.target;
         const clickXPercent = ((ev.x - offsetLeft) * 100) / offsetWidth;
 
+        // Define new item index depending on the click event.
         const newVisibleVideoIndex = Math.floor(clickXPercent / (100 / carouselItems.length));
 
+        // Update index and scroll carousel
         currentVisibleVideoIndex = newVisibleVideoIndex;
         carousel.scrollLeft = carouselItems[newVisibleVideoIndex]?.offsetLeft;
+    }
+
+    function resetCarousel() {
+        scrollCarouselByIndex(0);
+        resetScrollBar();
+        updateControlsAndScrollbarOnScroll();
     }
 
     resetCarousel();
 
     if (previousButton && nextButton) {
-        previousButton.addEventListener("click", () => scrollCarousel("previous"));
-        nextButton.addEventListener("click", () => scrollCarousel("next"));
+        previousButton.addEventListener("click", () => scrollCarouselByDirection("previous"));
+        nextButton.addEventListener("click", () => scrollCarouselByDirection("next"));
     }
 
     if (scrollBar) {
@@ -102,6 +127,7 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
     }
 
     carousel.addEventListener("scroll", updateControlsAndScrollbarOnScroll);
+    carousel.addEventListener("scrollend", updateIndexOnScrollEnd);
 
     window.addEventListener("resize", resetCarousel);
 }
