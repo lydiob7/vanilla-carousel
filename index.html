@@ -85,10 +85,17 @@
     <style>
         body {
             margin: 0;
+            scrollbar-width: none;
         }
 
         * {
             box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
         }
 
         .carousel .col {

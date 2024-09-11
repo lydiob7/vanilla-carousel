@@ -1,10 +1,10 @@
 function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollbarClass }) {
     let currentVisibleVideoIndex = 0;
-    const previousButton = document.querySelector(`.${sliderControlsClass} button[data-id="previous-btn"`);
-    const nextButton = document.querySelector(`.${sliderControlsClass} button[data-id="next-btn"`);
+    const previousButtons = [...document.querySelectorAll(`.${sliderControlsClass} button[data-id="previous-btn"`)];
+    const nextButtons = [...document.querySelectorAll(`.${sliderControlsClass} button[data-id="next-btn"`)];
     const carouselWrapper = document.querySelector(`.${sliderRowClass}`);
     const carousel = document.querySelector(`.${sliderRowClass} .col`);
-    const carouselItems = [...carousel.querySelectorAll(`.${sliderRowClass} .col > .child_column`)];
+    const carouselItems = [...carousel.querySelectorAll(`.${sliderRowClass} .col > .column_container`)];
     const scrollBar = document.querySelector(`.${scrollbarClass}`);
     const scrollBarThumb = document.querySelector(`.${scrollbarClass} .custom-scroll-bar-inner`);
 
@@ -62,13 +62,19 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
         scrollBarThumb.style.width = `${thumbPercent}%`;
     }
 
+    function toggleButtons(buttons, bool) {
+        buttons.forEach((btn) => {
+            btn.disabled = bool;
+        });
+    }
+
     function updateControlsAndScrollbarOnScroll() {
-        if (nextButton && previousButton) {
+        if (nextButtons?.length && previousButtons?.length) {
             // Update buttons state depending on carousel position
-            if (isInViewport(carouselItems[carouselItems.length - 1])) nextButton.disabled = true;
-            else nextButton.disabled = false;
-            if (isInViewport(carouselItems[0])) previousButton.disabled = true;
-            else previousButton.disabled = false;
+            if (isInViewport(carouselItems[carouselItems.length - 1])) toggleButtons(nextButtons, true);
+            else toggleButtons(nextButtons, false);
+            if (isInViewport(carouselItems[0])) toggleButtons(previousButtons, true);
+            else toggleButtons(previousButtons, false);
         }
 
         if (scrollBarThumb) {
@@ -117,9 +123,13 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
 
     resetCarousel();
 
-    if (previousButton && nextButton) {
-        previousButton.addEventListener("click", () => scrollCarouselByDirection("previous"));
-        nextButton.addEventListener("click", () => scrollCarouselByDirection("next"));
+    if (previousButtons?.length && nextButtons?.length) {
+        previousButtons.forEach((previousButton) => {
+            previousButton.addEventListener("click", () => scrollCarouselByDirection("previous"));
+        });
+        nextButtons.forEach((nextButton) => {
+            nextButton.addEventListener("click", () => scrollCarouselByDirection("next"));
+        });
     }
 
     if (scrollBar) {
