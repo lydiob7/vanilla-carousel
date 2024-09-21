@@ -22,25 +22,13 @@
 
     <style>
         .controls-wrapper {
-            width: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
-            max-width: 1350px;
-            padding: 0 2rem;
-            margin: 0 auto;
-            margin-top: 48px;
         }
 
-        @media (min-width: 1000px) {
-            .controls-wrapper {
-                justify-content: flex-end;
-                margin-top: 0;
-            }
-        }
-
-        .controls-wrapper .slider-control {
+        .controls-wrapper .carousel-control {
             background-color: transparent;
             border: 1px solid black;
             padding: 5px 10px;
@@ -48,13 +36,13 @@
             cursor: pointer;
         }
 
-        .controls-wrapper .slider-control[disabled] {
+        .controls-wrapper .carousel-control[disabled] {
             opacity: 0.4;
         }
     </style>
 
-    <div class="controls-wrapper my-custom-controls-class">
-        <button class="slider-control previous-btn" data-id="previous-btn">
+    <div class="controls-wrapper my-custom-controls-class container">
+        <button class="carousel-control previous-btn" data-id="previous-btn">
             <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g id="Icon">
                     <path id="Vector 436"
@@ -64,7 +52,7 @@
             </svg>
         </button>
 
-        <button class="slider-control next-btn" data-id="next-btn">
+        <button class="carousel-control next-btn" data-id="next-btn">
             <svg width="24" height="25" viewBox="0 0 24 25" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <g id="Icon">
                     <path id="Vector 436"
@@ -98,7 +86,7 @@
             display: none;
         }
 
-        .carousel .col {
+        .carousel .carousel-items-wrapper {
             display: flex;
             gap: 24px;
             flex-wrap: nowrap !important;
@@ -109,12 +97,12 @@
             scroll-padding-left: 1rem;
         }
 
-        .carousel .col {
+        .carousel .carousel-items-wrapper {
             -ms-overflow-style: none;
             scrollbar-width: none;
         }
 
-        .carousel .col .column_container {
+        .carousel .carousel-items-wrapper .carousel-item {
             flex-shrink: 0;
             width: calc(100vw - 2rem) !important;
             min-height: 250px;
@@ -126,34 +114,34 @@
         }
 
         @media (min-width: 1000px) {
-            .carousel .col {
+            .carousel .carousel-items-wrapper {
                 padding-left: max(2rem, calc(50vw - (1350px / 2)));
                 scroll-padding-left: max(2rem, calc(50vw - (1350px / 2)));
             }
 
-            .carousel .col .column_container {
+            .carousel .carousel-items-wrapper .carousel-item {
                 width: 488px !important;
             }
         }
     </style>
 
     <div class="carousel">
-        <div class="col">
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
-            <div class="column_container child_column"></div>
+        <div class="carousel-items-wrapper">
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
+            <div class="carousel-item"></div>
         </div>
     </div>
 

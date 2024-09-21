@@ -3,8 +3,8 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
     const previousButtons = [...document.querySelectorAll(`.${sliderControlsClass} button[data-id="previous-btn"`)];
     const nextButtons = [...document.querySelectorAll(`.${sliderControlsClass} button[data-id="next-btn"`)];
     const carouselWrapper = document.querySelector(`.${sliderRowClass}`);
-    const carousel = document.querySelector(`.${sliderRowClass} .col`);
-    const carouselItems = [...carousel.querySelectorAll(`.${sliderRowClass} .col > .column_container`)];
+    const carousel = document.querySelector(`.${sliderRowClass} .carousel-items-wrapper`);
+    const carouselItems = [...carousel.querySelectorAll(`.${sliderRowClass} .carousel-items-wrapper > .carousel-item`)];
     const scrollBar = document.querySelector(`.${scrollbarClass}`);
     const scrollBarThumb = document.querySelector(`.${scrollbarClass} .custom-scroll-bar-inner`);
 
