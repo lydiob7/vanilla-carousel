@@ -1,10 +1,10 @@
-function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollbarClass }) {
+function makeCarouselInteractive({ scrollbarClass }) {
     let currentVisibleVideoIndex = 0;
-    const previousButtons = [...document.querySelectorAll(`.${sliderControlsClass} button[data-id="previous-btn"`)];
-    const nextButtons = [...document.querySelectorAll(`.${sliderControlsClass} button[data-id="next-btn"`)];
-    const carouselWrapper = document.querySelector(`.${sliderRowClass}`);
-    const carousel = document.querySelector(`.${sliderRowClass} .carousel-items-wrapper`);
-    const carouselItems = [...carousel.querySelectorAll(`.${sliderRowClass} .carousel-items-wrapper > .carousel-item`)];
+    const previousButtons = [...document.querySelectorAll(`.controls-wrapper .previous-btn`)];
+    const nextButtons = [...document.querySelectorAll(`.controls-wrapper .next-btn`)];
+    const carouselWrapper = document.querySelector(`.carousel-section`);
+    const carousel = document.querySelector(`.carousel-section .carousel-items-wrapper`);
+    const carouselItems = [...carousel.querySelectorAll(`.carousel-section .carousel-items-wrapper > .carousel-item`)];
     const scrollBar = document.querySelector(`.${scrollbarClass}`);
     const scrollBarThumb = document.querySelector(`.${scrollbarClass} .custom-scroll-bar-inner`);
 
@@ -64,7 +64,8 @@ function makeCarouselInteractive({ sliderControlsClass, sliderRowClass, scrollba
 
     function toggleButtons(buttons, bool) {
         buttons.forEach((btn) => {
-            btn.disabled = bool;
+            if (bool) btn.classList.add("disabled");
+            else btn.classList.remove("disabled");
         });
     }
 
