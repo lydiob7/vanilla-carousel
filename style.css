@@ -85,7 +85,6 @@ body {
 
 .carousel .carousel-items-wrapper .carousel-item:last-of-type {
     margin-right: 100%;
-    background: salmon;
 }
 
 @media (min-width: 1000px) {

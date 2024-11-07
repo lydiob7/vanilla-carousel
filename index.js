@@ -2,13 +2,15 @@ function makeCarouselInteractive({ scrollbarClass }) {
     let currentVisibleVideoIndex = 0;
     const previousButtons = [...document.querySelectorAll(`.controls-wrapper .previous-btn`)];
     const nextButtons = [...document.querySelectorAll(`.controls-wrapper .next-btn`)];
-    const carouselWrapper = document.querySelector(`.carousel-section`);
-    const carousel = document.querySelector(`.carousel-section .carousel-items-wrapper`);
-    const carouselItems = [...carousel.querySelectorAll(`.carousel-section .carousel-items-wrapper > .carousel-item`)];
+    const carouselWrapper = document.querySelector(`.carousel`);
+    const carousel = document.querySelector(`.carousel .carousel-items-wrapper`);
+    const carouselItems = [...carousel.querySelectorAll(`.carousel .carousel-items-wrapper > .carousel-item`)];
     const scrollBar = document.querySelector(`.${scrollbarClass}`);
     const scrollBarThumb = document.querySelector(`.${scrollbarClass} .custom-scroll-bar-inner`);
 
     if (!carouselWrapper || !carousel || !carouselItems?.length) return;
+
+    let updatedScrollBarThumbPosition = false;
 
     function isInViewport(element) {
         const rect = element.getBoundingClientRect();
@@ -79,11 +81,13 @@ function makeCarouselInteractive({ scrollbarClass }) {
         }
 
         if (scrollBarThumb) {
-            // Update scroll bar thumb position in relation with current carousel scroll state
-            const childWidth = carousel.scrollWidth;
-            const thumbOffsetPercent = (carousel.scrollLeft * 100) / childWidth;
+            if (!updatedScrollBarThumbPosition) {
+                // Update scroll bar thumb position in relation with current carousel scroll state
+                const childWidth = carousel.scrollWidth;
+                const thumbOffsetPercent = (carousel.scrollLeft * 100) / childWidth;
 
-            scrollBarThumb.style.left = `${thumbOffsetPercent}%`;
+                scrollBarThumb.style.left = `${thumbOffsetPercent}%`;
+            }
         }
     }
 
@@ -101,20 +105,67 @@ function makeCarouselInteractive({ scrollbarClass }) {
         });
     }
 
-    function makeScrollBarInteractive(ev) {
-        if (!scrollBarThumb) return;
+    // ============================== Scroll bar ============================ //
 
-        // Calculate the percentage from the left of the click event
-        const { offsetWidth, offsetLeft } = ev.target;
-        const clickXPercent = ((ev.x - offsetLeft) * 100) / offsetWidth;
+    function makeScrollBarInteractive() {
+        if (!scrollBar || !scrollBarThumb) return;
+        const scrollBarClient = scrollBar.getBoundingClientRect();
+        const scrollBarStart = scrollBarClient.x;
+        const scrollBarWidth = scrollBarClient.width;
+        const scrollBarEnd = scrollBarStart + scrollBarWidth;
+        const scrollBarThumbWidth = scrollBarThumb.getBoundingClientRect().width;
 
-        // Define new item index depending on the click event.
-        const newVisibleVideoIndex = Math.floor(clickXPercent / (100 / carouselItems.length));
+        let isScrollBarMoving = false;
+        let scrollX = scrollBarClient.x;
 
-        // Update index and scroll carousel
-        currentVisibleVideoIndex = newVisibleVideoIndex;
-        carousel.scrollLeft = carouselItems[newVisibleVideoIndex]?.offsetLeft;
+        function getUpdatedScrollX() {
+            return scrollX;
+        }
+
+        function startScrollBarThumbMove(ev) {
+            isScrollBarMoving = true;
+        }
+
+        function moveScrollBarThumb(ev) {
+            if (!isScrollBarMoving) return;
+
+            if (ev.clientX > scrollBarStart && ev.clientX < scrollBarEnd) {
+                scrollX = ev.clientX;
+
+                // Update scroll bar thumb position in relation with mouse position
+                const thumbOffsetPercent = ((ev.clientX - scrollBarStart) * 100) / scrollBarWidth;
+                const thumbOffset = (thumbOffsetPercent * (scrollBarWidth - scrollBarThumbWidth)) / 100;
+
+                scrollBarThumb.style.left = `${thumbOffset}px`;
+                updatedScrollBarThumbPosition = true;
+            }
+        }
+
+        function endScrollBarThumbMove(ev) {
+            if (!isScrollBarMoving) return;
+
+            // Calculate the percentage from the left of the click event
+            const clickXPercent = ((getUpdatedScrollX() - scrollBarStart) * 100) / scrollBarWidth;
+
+            // Define new item index depending on the click event.
+            const newVisibleVideoIndex = Math.floor(clickXPercent / (100 / carouselItems.length));
+
+            // Update index and scroll carousel
+            currentVisibleVideoIndex = newVisibleVideoIndex;
+            carousel.scrollLeft = carouselItems[newVisibleVideoIndex]?.offsetLeft;
+
+            isScrollBarMoving = false;
+            setTimeout(() => {
+                updatedScrollBarThumbPosition = false;
+            }, 1000);
+        }
+
+        scrollBar.addEventListener("mousedown", startScrollBarThumbMove);
+        window.addEventListener("mousemove", moveScrollBarThumb);
+        window.addEventListener("mouseup", endScrollBarThumbMove);
     }
+
+    // ================================ Reset carousel ============================== //
 
     function resetCarousel() {
         scrollCarouselByIndex(0);
@@ -133,9 +184,7 @@ function makeCarouselInteractive({ scrollbarClass }) {
         });
     }
 
-    if (scrollBar) {
-        scrollBar.addEventListener("click", makeScrollBarInteractive);
-    }
+    makeScrollBarInteractive();
 
     carousel.addEventListener("scroll", updateControlsAndScrollbarOnScroll);
     carousel.addEventListener("scrollend", updateIndexOnScrollEnd);
